@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Felipe & Suelen | Nosso Casamento</title>
+  <title>Suelen & Felipe | Nosso Casamento</title>
   <style>
     :root {
       --bg: #fff8f3;
@@ -357,7 +357,7 @@
 <body>
   <header>
     <div class="container nav">
-      <a href="#home" class="brand">Felipe & Suelen</a>
+      <a href="#home" class="brand">Suelen & Felipe</a>
       <nav class="nav-links">
         <a href="#convite">Convite</a>
         <a href="#presenca">Confirmar presença</a>
@@ -370,7 +370,7 @@
   <main id="home" class="container">
     <section class="hero">
       <div class="hero-text">
-        <div class="date-box">💍 25 de Setembro de 2026</div>
+        <div class="date-box">💍 6 de Setembro de 2026</div>
         <h1>Nosso grande dia está chegando</h1>
         <p id="mensagemConvite">
           Com alegria no coração, convidamos você para celebrar conosco esse momento tão especial.
@@ -387,7 +387,7 @@
         <img src="./fotos/foto5.jpeg" alt="Foto do casal 5" />
 
   <div class="photo-overlay">
-          <strong>Felipe & Suelen</strong>
+          <strong>Suelen & Felipe</strong>
           <p>Uma nova história começa aqui.</p>
         </div>
       </div>
@@ -416,8 +416,8 @@
           <div class="guest-list" id="guestList"></div>
 
           <div class="input-group">
-            <label for="observacao">Observação opcional</label>
-            <textarea id="observacao" placeholder="Ex: Chegaremos um pouco mais tarde, temos restrição alimentar etc."></textarea>
+            <label for="observacao">Comentários</label>
+            <textarea id="observacao" placeholder="Ex:Escreva aqui..."></textarea>
           </div>
 
           <button class="btn" style="margin-top: 16px;" onclick="confirmarPresenca()">Confirmar presença</button>
@@ -427,10 +427,10 @@
         <div class="card">
           <h3>Informações do casamento</h3>
           <div style="display: grid; gap: 14px; margin-top: 18px; color: var(--muted); line-height: 1.6;">
-            <p><strong>Data:</strong> 25 de Setembro de 2026</p>
-            <p><strong>Horário:</strong> 19h</p>
-            <p><strong>Local:</strong> Coloque aqui o nome do salão/igreja</p>
-            <p><strong>Endereço:</strong> Coloque aqui o endereço completo</p>
+            <p><strong>Data:</strong> 6 de Setembro de 2026</p>
+            <p><strong>Horário:</strong> 18h</p>
+            <p><strong>Local:</strong> Espaço Cantagalo</p>
+            <p><strong>Endereço:</strong> Estrada do Cantagalo, 865 - Lote 2, Campo Grande, RJ</p>
           </div>
         </div>
       </div>
@@ -461,11 +461,11 @@
 
         <div class="card pix-box">
           <h3>Pagamento via Pix</h3>
-          <div class="qr-placeholder">QR Code Pix aqui</div>
+          <canvas id="qrcode"></canvas>
           <p style="color: var(--muted); line-height: 1.5;">
             Chave Pix:
             <br />
-            <strong id="pixKey">seu-pix-aqui@email.com</strong>
+            <strong id="pixKey">21999931247</strong>
           </p>
           <button class="btn" onclick="copiarPix()">Copiar chave Pix</button>
           <p style="color: var(--muted); font-size: 14px; line-height: 1.5;">
@@ -655,6 +655,7 @@
 
       const total = carrinho.reduce((soma, item) => soma + item.preco, 0);
       cartTotal.textContent = formatarMoeda(total);
+      gerarPix();
     }
 
     function copiarPix() {
@@ -663,6 +664,28 @@
       pixMessage.style.display = "block";
       pixMessage.textContent = "Chave Pix copiada com sucesso!";
     }
+
+    function gerarPix() {
+  const total = carrinho.reduce((soma, item) => soma + item.preco, 0);
+
+  const payload = `
+000201
+26580014BR.GOV.BCB.PIX
+013621999931247
+52040000
+5303986
+54${total.toFixed(2)}
+5802BR
+5913Felipe Viana
+6009Sao Goncalo
+62070503***
+6304
+`;
+
+  QRCode.toCanvas(document.getElementById('qrcode'), payload, function (error) {
+    if (error) console.error(error);
+  });
+}
 
     // =============================
     // INICIALIZAÇÃO
@@ -673,5 +696,6 @@
     renderPresentes();
     renderCarrinho();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </body>
 </html>
