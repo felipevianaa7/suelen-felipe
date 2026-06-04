@@ -514,6 +514,26 @@
    //   }
    // };
 
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyDRxzCw9FJ-gSFfznw0EAl7HBqnrCPM6GQ",
+      authDomain: "casamento-suelen-felipe.firebaseapp.com",
+      projectId: "casamento-suelen-felipe",
+      storageBucket: "casamento-suelen-felipe.firebasestorage.app",
+      messagingSenderId: "304619466326",
+      appId: "1:304619466326:web:6be173a3612945781e55f7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
     const presentes = [
       { id: 1, emoji: "🍽️", nome: "Jantar romântico", preco: 100 },
       { id: 2, emoji: "🏖️", nome: "Cota lua de mel", preco: 150 },
@@ -731,27 +751,7 @@
     
     carregarConvidados();
     renderPresentes();
-    renderCarrinho();
-
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      updateDoc
-    } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-    
-    const firebaseConfig = {
-      apiKey: "AIzaSyDRxzCw9FJ-gSFfznw0EAl7HBqnrCPM6GQ",
-      authDomain: "casamento-suelen-felipe.firebaseapp.com",
-      projectId: "casamento-suelen-felipe",
-      storageBucket: "casamento-suelen-felipe.firebasestorage.app",
-      messagingSenderId: "304619466326",
-      appId: "1:304619466326:web:6be173a3612945781e55f7"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    renderCarrinho();    
   </script>  
 </body>
 </html>
