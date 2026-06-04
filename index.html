@@ -492,25 +492,25 @@
     </div>
   </footer>
 
-  <script>
+  <script type="module">
     // =============================
     // CONFIGURAÇÕES PRINCIPAIS
     // =============================
 
-    const convidadosPorCodigo = {
-      "familia-exemplo": {
-        titulo: "Família Exemplo",
-        nomes: ["João Exemplo", "Maria Exemplo", "Carlos Exemplo"]
-      },
-      "amigo-felipe": {
-        titulo: "Amigo do Felipe",
-        nomes: ["Rafael Souza"]
-      },
-      "familia-suelen": {
-        titulo: "Família da Suelen",
-        nomes: ["Ana Paula", "Marcos Paulo", "Larissa Paula"]
-      }
-    };
+    //const convidadosPorCodigo = {
+    //  "familia-exemplo": {
+    //    titulo: "Família Exemplo",
+    //    nomes: ["João Exemplo", "Maria Exemplo", "Carlos Exemplo"]
+   //   },
+    //  "amigo-felipe": {
+   //     titulo: "Amigo do Felipe",
+   //     nomes: ["Rafael Souza"]
+   //   },
+   //   "familia-suelen": {
+   //    titulo: "Família da Suelen",
+   //     nomes: ["Ana Paula", "Marcos Paulo", "Larissa Paula"]
+   //   }
+   // };
 
     const presentes = [
       { id: 1, emoji: "🍽️", nome: "Jantar romântico", preco: 100 },
@@ -549,17 +549,35 @@
       return params.get("convite") || "familia-exemplo";
     }
 
-    function carregarConvidados() {
+    async function carregarConvidados() {
       const codigo = obterCodigoConvite();
-      const dados = convidadosPorCodigo[codigo] || convidadosPorCodigo["familia-exemplo"];
-
-      document.getElementById("tituloFamilia").textContent = `Convite para: ${dados.titulo}`;
-      document.getElementById("mensagemConvite").textContent = `${dados.titulo}, convidamos vocês para celebrar conosco esse momento tão especial.`;
-
+    
+      const ref = doc(db, "convites", codigo);
+      const snapshot = await getDoc(ref);
+    
+      if (!snapshot.exists()) {
+        document.getElementById("tituloFamilia").textContent = "Convite não encontrado";
+        document.getElementById("mensagemConvite").textContent =
+          "Não encontramos esse convite. Confira se o link está correto.";
+    
+        document.getElementById("guestList").innerHTML = `
+          <p style="color: var(--danger);">
+            Convite não encontrado.
+          </p>
+        `;
+        return;
+      }
+    
+      const dados = snapshot.data();
+    
+      document.getElementById("tituloFamilia").textContent = `Convite para: ${dados.nomeConvite}`;
+      document.getElementById("mensagemConvite").textContent =
+        `${dados.nomeConvite}, convidamos vocês para celebrar conosco esse momento tão especial.`;
+    
       const guestList = document.getElementById("guestList");
       guestList.innerHTML = "";
-
-      dados.nomes.forEach((nome, index) => {
+    
+      dados.convidados.forEach((nome, index) => {
         const label = document.createElement("label");
         label.className = "guest-item";
         label.innerHTML = `
@@ -570,11 +588,13 @@
       });
     }
 
-    function confirmarPresenca() {
-      const selecionados = [...document.querySelectorAll("#guestList input:checked")].map(input => input.value);
+    async function confirmarPresenca() {
+      const selecionados = [...document.querySelectorAll("#guestList input:checked")]
+        .map(input => input.value);
+    
       const observacao = document.getElementById("observacao").value.trim();
       const message = document.getElementById("rsvpMessage");
-
+    
       if (selecionados.length === 0) {
         message.style.display = "block";
         message.style.background = "#fff0f0";
@@ -582,18 +602,17 @@
         message.textContent = "Selecione pelo menos uma pessoa para confirmar presença.";
         return;
       }
-
-      const confirmacao = {
-        convite: obterCodigoConvite(),
+    
+      const codigo = obterCodigoConvite();
+      const ref = doc(db, "convites", codigo);
+    
+      await updateDoc(ref, {
         confirmados: selecionados,
-        observacao,
-        data: new Date().toLocaleString("pt-BR")
-      };
-
-      // Nesta versão simples, salva no navegador.
-      // Depois podemos trocar por Firebase, MongoDB ou Google Sheets.
-      localStorage.setItem(`confirmacao-${obterCodigoConvite()}`, JSON.stringify(confirmacao));
-
+        observacao: observacao,
+        respondeu: true,
+        respondidoEm: new Date().toISOString()
+      });
+    
       message.style.display = "block";
       message.style.background = "#eef8f0";
       message.style.color = "#2f7d46";
@@ -701,9 +720,36 @@
     // =============================
 
     document.getElementById("pixKey").textContent = chavePix;
+    
+    window.confirmarPresenca = confirmarPresenca;
+    window.adicionarAoCarrinho = adicionarAoCarrinho;
+    window.removerDoCarrinho = removerDoCarrinho;
+    window.limparCarrinho = limparCarrinho;
+    window.copiarPix = copiarPix;
+    
     carregarConvidados();
     renderPresentes();
     renderCarrinho();
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyDRxzCw9FJ-gSFfznw0EAl7HBqnrCPM6GQ",
+      authDomain: "casamento-suelen-felipe.firebaseapp.com",
+      projectId: "casamento-suelen-felipe",
+      storageBucket: "casamento-suelen-felipe.firebasestorage.app",
+      messagingSenderId: "304619466326",
+      appId: "1:304619466326:web:6be173a3612945781e55f7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
   </script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </body>
