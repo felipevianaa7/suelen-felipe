@@ -85,33 +85,7 @@ const db = getFirestore(app);
 
 const resultado = document.getElementById("resultado");
 
-async function importarConvites(){
-
-    resultado.textContent="Carregando JSON...\n\n";
-
-    let resposta;
-
-    try{
-
-        resposta = await fetch("./convites_firebase_atualizado.json");
-
-    }catch{
-
-        resultado.textContent="Erro ao localizar o JSON.";
-
-        return;
-
-    }
-
-    if(!resposta.ok){
-
-        resultado.textContent="Arquivo JSON não encontrado.";
-
-        return;
-
-    }
-
-  async function verConfirmados() {
+async function verConfirmados() {
       resultado.textContent = "Buscando confirmações...\n\n";
     
       const snapshot = await getDocs(collection(db, "convites"));
@@ -146,7 +120,33 @@ async function importarConvites(){
       resultado.textContent += `Resumo:\n`;
       resultado.textContent += `Grupos que responderam: ${gruposRespondidos}\n`;
       resultado.textContent += `Total de pessoas confirmadas: ${totalConfirmados}\n`;
+    }  
+
+async function importarConvites(){
+
+    resultado.textContent="Carregando JSON...\n\n";
+
+    let resposta;
+
+    try{
+
+        resposta = await fetch("./convites_firebase_atualizado.json");
+
+    }catch{
+
+        resultado.textContent="Erro ao localizar o JSON.";
+
+        return;
+
     }
+
+    if(!resposta.ok){
+
+        resultado.textContent="Arquivo JSON não encontrado.";
+
+        return;
+
+    }  
 
     const convites = await resposta.json();
 
