@@ -3,62 +3,170 @@
 <head>
   <meta charset="UTF-8">
   <title>Importar Convites</title>
-</head>
-<body>
-  <h1>Importar convites para o Firebase</h1>
 
-  <button id="btnImportar">Importar convites</button>
-
-  <pre id="resultado"></pre>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      setDoc
-    } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "casamento-suelen-felipe.firebaseapp.com",
-      projectId: "casamento-suelen-felipe",
-      storageBucket: "casamento-suelen-felipe.firebasestorage.app",
-      messagingSenderId: "304619466326",
-      appId: "1:304619466326:web:6be173a3612945781e55f7"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    const resultado = document.getElementById("resultado");
-
-    async function importarConvites() {
-      resultado.textContent = "Carregando JSON...\n";
-
-      const resposta = await fetch("./convites_firebase_atualizado.json");
-      const convites = await resposta.json();
-
-      const codigos = Object.keys(convites);
-
-      resultado.textContent += `Encontrados ${codigos.length} convites.\n\n`;
-
-      for (const codigo of codigos) {
-        const dados = convites[codigo];
-
-        const ref = doc(db, "convites", codigo);
-        const existente = await getDoc(ref);
-        
-        if (existente.exists()) {
-          resultado.textContent += `⏭️ Já existia, não alterado: ${codigo} - ${dados.nomeConvite}\n`;
-          continue;
-        }
-
-      resultado.textContent += "\nImportação concluída com sucesso!";
+  <style>
+    body{
+      font-family: Arial, Helvetica, sans-serif;
+      max-width:900px;
+      margin:40px auto;
+      padding:20px;
+      background:#f8f8f8;
     }
 
-    document.getElementById("btnImportar").addEventListener("click", importarConvites);
-  </script>
+    button{
+      padding:12px 20px;
+      font-size:16px;
+      cursor:pointer;
+      border:none;
+      border-radius:8px;
+      background:#2e7d32;
+      color:white;
+    }
+
+    pre{
+      margin-top:20px;
+      padding:20px;
+      background:white;
+      border-radius:10px;
+      white-space:pre-wrap;
+      line-height:1.6;
+      border:1px solid #ddd;
+      min-height:300px;
+    }
+  </style>
+
+</head>
+<body>
+
+<h1>Importador de Convites</h1>
+
+<button id="btnImportar">
+Importar Convites
+</button>
+
+<pre id="resultado"></pre>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+
+  apiKey: "SUA_API_KEY",
+
+  authDomain: "casamento-suelen-felipe.firebaseapp.com",
+
+  projectId: "casamento-suelen-felipe",
+
+  storageBucket: "casamento-suelen-felipe.firebasestorage.app",
+
+  messagingSenderId: "304619466326",
+
+  appId: "1:304619466326:web:6be173a3612945781e55f7"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+const resultado = document.getElementById("resultado");
+
+async function importarConvites(){
+
+    resultado.textContent="Carregando JSON...\n\n";
+
+    let resposta;
+
+    try{
+
+        resposta = await fetch("./convites_firebase_atualizado.json");
+
+    }catch{
+
+        resultado.textContent="Erro ao localizar o JSON.";
+
+        return;
+
+    }
+
+    if(!resposta.ok){
+
+        resultado.textContent="Arquivo JSON não encontrado.";
+
+        return;
+
+    }
+
+    const convites = await resposta.json();
+
+    const codigos = Object.keys(convites);
+
+    resultado.textContent += `Encontrados ${codigos.length} convites.\n\n`;
+
+    let criados = 0;
+    let existentes = 0;
+
+    for(const codigo of codigos){
+
+        const dados = convites[codigo];
+
+        const ref = doc(db,"convites",codigo);
+
+        const documento = await getDoc(ref);
+
+        if(documento.exists()){
+
+            existentes++;
+
+            resultado.textContent += `⏭️ Já existia: ${codigo} - ${dados.nomeConvite}\n`;
+
+            continue;
+
+        }
+
+        await setDoc(ref,{
+            ...dados,
+            codigo
+        });
+
+        criados++;
+
+        resultado.textContent += `✅ Criado: ${codigo} - ${dados.nomeConvite}\n`;
+
+    }
+
+    resultado.textContent += `
+
+==================================
+
+Resumo
+
+🆕 Criados: ${criados}
+
+⏭️ Já existiam: ${existentes}
+
+Total analisado: ${codigos.length}
+
+==================================
+
+Importação concluída com sucesso!
+`;
+
+}
+
+document
+.getElementById("btnImportar")
+.addEventListener("click",importarConvites);
+
+</script>
+
 </body>
 </html>
