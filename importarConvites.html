@@ -16,6 +16,7 @@
     import {
       getFirestore,
       doc,
+      getDoc,
       setDoc
     } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
@@ -46,13 +47,13 @@
       for (const codigo of codigos) {
         const dados = convites[codigo];
 
-        await setDoc(doc(db, "convites", codigo), {
-          ...dados,
-          codigo: codigo
-        });
-
-        resultado.textContent += `✅ Importado: ${codigo} - ${dados.nomeConvite}\n`;
-      }
+        const ref = doc(db, "convites", codigo);
+        const existente = await getDoc(ref);
+        
+        if (existente.exists()) {
+          resultado.textContent += `⏭️ Já existia, não alterado: ${codigo} - ${dados.nomeConvite}\n`;
+          continue;
+        }
 
       resultado.textContent += "\nImportação concluída com sucesso!";
     }
