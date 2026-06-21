@@ -43,6 +43,10 @@
 <button id="btnImportar">
 Importar Convites
 </button>
+<button id="btnConfirmados">
+  Ver convidados confirmados
+</button>
+  
 
 <pre id="resultado"></pre>
 
@@ -54,7 +58,9 @@ import {
   getFirestore,
   doc,
   getDoc,
-  setDoc
+  setDoc,
+  collection,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -105,6 +111,43 @@ async function importarConvites(){
 
     }
 
+  async function verConfirmados() {
+      resultado.textContent = "Buscando confirmações...\n\n";
+    
+      const snapshot = await getDocs(collection(db, "convites"));
+    
+      let totalConfirmados = 0;
+      let gruposRespondidos = 0;
+    
+      snapshot.forEach((documento) => {
+        const dados = documento.data();
+    
+        if (dados.respondeu === true) {
+          gruposRespondidos++;
+    
+          const confirmados = dados.confirmados || [];
+          totalConfirmados += confirmados.length;
+    
+          resultado.textContent += `✅ ${dados.nomeConvite}\n`;
+          resultado.textContent += `Confirmados: ${confirmados.join(", ")}\n`;
+    
+          if (dados.observacao) {
+            resultado.textContent += `Observação: ${dados.observacao}\n`;
+          }
+    
+          if (dados.respondidoEm) {
+            resultado.textContent += `Data: ${new Date(dados.respondidoEm).toLocaleString("pt-BR")}\n`;
+          }
+    
+          resultado.textContent += "\n-------------------------\n\n";
+        }
+      });
+    
+      resultado.textContent += `Resumo:\n`;
+      resultado.textContent += `Grupos que responderam: ${gruposRespondidos}\n`;
+      resultado.textContent += `Total de pessoas confirmadas: ${totalConfirmados}\n`;
+    }
+
     const convites = await resposta.json();
 
     const codigos = Object.keys(convites);
@@ -143,7 +186,7 @@ async function importarConvites(){
 
     }
 
-    resultado.textContent += `
+    resultado.textContent += `    
 
 ==================================
 
@@ -165,6 +208,10 @@ Importação concluída com sucesso!
 document
 .getElementById("btnImportar")
 .addEventListener("click",importarConvites);
+
+ document
+ .getElementById("btnConfirmados")
+ .addEventListener("click", verConfirmados); 
 
 </script>
 
