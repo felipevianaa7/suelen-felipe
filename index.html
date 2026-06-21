@@ -357,6 +357,14 @@
       .nav-links {
         display: none;
       }
+
+      .gift-img {
+        width: 100%;
+        height: 130px;
+        object-fit: cover;
+        border-radius: 18px;
+        margin-bottom: 8px;
+      }
     }
   </style>
 </head>
@@ -535,12 +543,15 @@
     const db = getFirestore(app);
     
     const presentes = [
-      { id: 1, emoji: "🍽️", nome: "Jantar romântico", preco: 100 },
-      { id: 2, emoji: "🏖️", nome: "Cota lua de mel", preco: 150 },
-      { id: 3, emoji: "🏠", nome: "Ajuda para o novo lar", preco: 200 },
-      { id: 4, emoji: "☕", nome: "Café da manhã dos noivos", preco: 80 },
-      { id: 5, emoji: "✈️", nome: "Passeio da lua de mel", preco: 250 },
-      { id: 6, emoji: "🎁", nome: "Presente livre simbólico", preco: 50 }
+      { id: 1, imagem: "./presentes/cafe.png", nome: "Café para aguentar os primeiros meses", preco: 20 },
+      { id: 2, imagem: "./presentes/macarrao.png", nome: "Macarrão da emergência financeira", preco: 30 },
+      { id: 3, imagem: "./presentes/papel.png", nome: "Papel higiênico para evitar crises conjugais", preco: 40 },
+      { id: 4, imagem: "./presentes/pizza.png", nome: "Pizza da reconciliação", preco: 60 },
+      { id: 5, imagem: "./presentes/sofa.png", nome: "Fundo para maratonas no sofá", preco: 100 },
+      { id: 6, imagem: "./presentes/terapia.png", nome: "Terapia de casal preventiva", preco: 150 },
+      { id: 7, imagem: "./presentes/praia.png", nome: "Fuga romântica após discutir sobre a louça", preco: 250 },
+      { id: 8, imagem: "./presentes/aeroporto.png", nome: "Lua de mel sem perrengues", preco: 500 },
+      { id: 9, imagem: "./presentes/coroas.png", nome: "Patrocine a felicidade dos noivos", preco: 0, valorLivre: true }
     ];
 
     const chavePix = "21999931247";
@@ -652,23 +663,53 @@
     function renderPresentes() {
       const giftGrid = document.getElementById("giftGrid");
       giftGrid.innerHTML = "";
-
+    
       presentes.forEach(presente => {
         const card = document.createElement("div");
         card.className = "card gift-card";
+    
+        const precoTexto = presente.valorLivre ? "Valor livre" : formatarMoeda(presente.preco);
+    
         card.innerHTML = `
-          <div class="gift-emoji">${presente.emoji}</div>
+          <img class="gift-img" src="${presente.imagem}" alt="${presente.nome}" />
           <h3>${presente.nome}</h3>
-          <p class="price">${formatarMoeda(presente.preco)}</p>
-          <button class="btn" onclick="adicionarAoCarrinho(${presente.id})">Adicionar ao carrinho</button>
+          <p class="price">${precoTexto}</p>
+    
+          ${
+            presente.valorLivre
+              ? `<input type="number" id="valor-livre-${presente.id}" placeholder="Digite o valor" min="1" />`
+              : ""
+          }
+    
+          <button class="btn" onclick="adicionarAoCarrinho(${presente.id})">
+            Adicionar ao carrinho
+          </button>
         `;
+    
         giftGrid.appendChild(card);
       });
     }
 
     function adicionarAoCarrinho(id) {
       const presente = presentes.find(item => item.id === id);
-      carrinho.push(presente);
+    
+      if (presente.valorLivre) {
+        const input = document.getElementById(`valor-livre-${presente.id}`);
+        const valorDigitado = Number(input.value);
+    
+        if (!valorDigitado || valorDigitado <= 0) {
+          alert("Digite um valor válido para o presente livre.");
+          return;
+        }
+    
+        carrinho.push({
+          ...presente,
+          preco: valorDigitado
+        });
+      } else {
+        carrinho.push(presente);
+      }
+    
       renderCarrinho();
       window.location.hash = "pix";
     }
@@ -696,7 +737,7 @@
         const row = document.createElement("div");
         row.className = "cart-item";
         row.innerHTML = `
-          <span>${item.emoji} ${item.nome}</span>
+          <span>${item.nome}</span>
           <strong>${formatarMoeda(item.preco)}</strong>
           <button class="btn secondary" onclick="removerDoCarrinho(${index})">Remover</button>
         `;
