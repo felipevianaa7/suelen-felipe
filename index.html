@@ -485,7 +485,7 @@
             <br />
             <strong id="pixKey">21999931247</strong>
           </p>
-          <button class="btn" onclick="copiarPix()">Copiar chave Pix</button>         
+          <button class="btn" onclick="copiarPix()">Copiar Pix Copia e Cola</button>         
           <p style="color: var(--muted); font-size: 14px; line-height: 1.5;">
             Após o pagamento, envie o comprovante para os noivos pelo WhatsApp.
           </p>
@@ -750,34 +750,97 @@
       gerarPix();
     }
 
+    function removerAcentos(texto) {
+      return texto
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9 ]/g, "")
+        .substring(0, 25);
+    }
+
+    function montarCampo(id, valor) {
+      const tamanho = String(valor.length).padStart(2, "0");
+      return id + tamanho + valor;
+    }
+
+    function crc16(payload) {
+      let crc = 0xffff;
+
+      for (let i = 0; i < payload.length; i++) {
+        crc ^= payload.charCodeAt(i) << 8;
+
+        for (let j = 0; j < 8; j++) {
+          if ((crc & 0x8000) !== 0) {
+            crc = (crc << 1) ^ 0x1021;
+          } else {
+            crc <<= 1;
+          }
+
+          crc &= 0xffff;
+        }
+      }
+
+      return crc.toString(16).toUpperCase().padStart(4, "0");
+    }
+
+    function gerarPayloadPix(valor) {
+      const chavePixPayload = "21999931247";
+      const nomeRecebedor = removerAcentos("Felipe Viana");
+      const cidade = removerAcentos("Sao Goncalo");
+
+      const merchantAccountInfo =
+        montarCampo("00", "BR.GOV.BCB.PIX") +
+        montarCampo("01", chavePixPayload);
+
+      let payload =
+        montarCampo("00", "01") +
+        montarCampo("26", merchantAccountInfo) +
+        montarCampo("52", "0000") +
+        montarCampo("53", "986");
+
+      if (valor > 0) {
+        payload += montarCampo("54", valor.toFixed(2));
+      }
+
+      payload +=
+        montarCampo("58", "BR") +
+        montarCampo("59", nomeRecebedor) +
+        montarCampo("60", cidade) +
+        montarCampo("62", montarCampo("05", "***"));
+
+      payload += "6304";
+      payload += crc16(payload);
+
+      return payload;
+    }
+
     function copiarPix() {
-      navigator.clipboard.writeText(chavePix);
+      const total = carrinho.reduce((soma, item) => soma + item.preco, 0);
+      const payload = gerarPayloadPix(total);
+
+      navigator.clipboard.writeText(payload);
+
       const pixMessage = document.getElementById("pixMessage");
       pixMessage.style.display = "block";
-      pixMessage.textContent = "Chave Pix copiada com sucesso!";
+      pixMessage.textContent = "Pix Copia e Cola copiado com sucesso!";
     }
 
     function gerarPix() {
-  const total = carrinho.reduce((soma, item) => soma + item.preco, 0);
+      const total = carrinho.reduce((soma, item) => soma + item.preco, 0);
+      const payload = gerarPayloadPix(total);
 
-  const payload = `
-000201
-26580014BR.GOV.BCB.PIX
-013621999931247
-52040000
-5303986
-54${total.toFixed(2)}
-5802BR
-5913Felipe Viana
-6009Sao Goncalo
-62070503***
-6304
-`;
-
-  QRCode.toCanvas(document.getElementById('qrcode'), payload, function (error) {
-    if (error) console.error(error);
-  });
-}
+      QRCode.toCanvas(
+        document.getElementById("qrcode"),
+        payload,
+        {
+          width: 220,
+          margin: 2
+        },
+        function (error) {
+          if (error) console.error(error);
+        }
+      );
+    }
 
     // =============================
     // INICIALIZAÇÃO
