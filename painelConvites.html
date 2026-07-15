@@ -51,10 +51,10 @@ async function confirmados(){loading(true);try{const c=await todos(),r=c.filter(
 async function pendentes(){loading(true);try{const c=await todos(),p=c.filter(x=>x.respondeu!==true),total=p.reduce((s,x)=>s+(x.convidados||[]).length,0);resultado.innerHTML=`<h2>Convites pendentes</h2><div class="summary"><div class="summary-card">Convites pendentes<strong>${p.length}</strong></div><div class="summary-card">Pessoas aguardando resposta<strong>${total}</strong></div></div><div class="list">${p.map(x=>`<article class="item"><h3>⏳ ${esc(x.nomeConvite||x.grupoPlanilha||x.codigo)}</h3><div><strong>Grupo:</strong> ${esc(x.grupoPlanilha||"—")}</div><div><strong>Convidados:</strong> ${esc((x.convidados||[]).join(", "))}</div><div><strong>Link:</strong> ${esc(x.linkPersonalizado||`https://suelen-felipe.vercel.app/?convite=${x.codigo}`)}</div></article>`).join("")||'<div class="empty">Todos já responderam.</div>'}</div>`}catch(e){aviso(`Erro: ${e.message}`,true)}finally{loading(false)}}
 
 async function listaPresenca() {
-  definirCarregamento(true);
+  loading(true);
 
   try {
-    const convites = await buscarTodosConvites();
+    const convites = await todos();
 
     const grupos = convites
       .filter(convite => (convite.confirmados || []).length > 0)
@@ -79,22 +79,18 @@ async function listaPresenca() {
 
     const itens = grupos.map(convite => {
       const confirmados = convite.confirmados || [];
+
       totalConfirmados += confirmados.length;
 
-      const pessoas = confirmados.map(nome => {
-        const numeroAtual = contador++;
+      return confirmados.map(nome => `
+        <article class="item">
+          <strong>${contador++}. ${esc(nome)}</strong>
 
-        return `
-          <article class="item">
-            <strong>${numeroAtual}. ${escaparHtml(nome)}</strong>
-            <div class="muted">
-              ${escaparHtml(convite.grupoPlanilha || convite.nomeConvite || "")}
-            </div>
-          </article>
-        `;
-      }).join("");
-
-      return pessoas;
+          <div class="muted">
+            ${esc(convite.grupoPlanilha || convite.nomeConvite || "")}
+          </div>
+        </article>
+      `).join("");
     }).join("");
 
     resultado.innerHTML = `
@@ -111,13 +107,12 @@ async function listaPresenca() {
         ${itens || '<div class="empty">Nenhum convidado confirmado ainda.</div>'}
       </div>
     `;
-  } catch (erro) {
-    mostrarStatus(
-      `Erro ao montar lista de presença: ${erro.message}`,
-      "erro"
-    );
+
+  } catch (e) {
+    aviso(`Erro ao montar lista de presença: ${e.message}`, true);
+
   } finally {
-    definirCarregamento(false);
+    loading(false);
   }
 }
 
