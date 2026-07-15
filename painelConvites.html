@@ -31,17 +31,11 @@
   <section id="resultado" class="panel"><h2>Bem-vindo</h2><p class="muted">Escolha uma opção acima.</p></section>
 </main>
 <script type="module">
+
+import { firebaseConfig } from "./firebase.js";  
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 import {getFirestore,doc,getDoc,setDoc,collection,getDocs} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-const firebaseConfig={
-  apiKey:"AIzaSyDRxzCw9FJ-gSFfznw0EAl7HBqnrCPM6GQ",
-  authDomain:"casamento-suelen-felipe.firebaseapp.com",
-  projectId:"casamento-suelen-felipe",
-  storageBucket:"casamento-suelen-felipe.firebasestorage.app",
-  messagingSenderId:"304619466326",
-  appId:"1:304619466326:web:6be173a3612945781e55f7"
-};
 const app=initializeApp(firebaseConfig),db=getFirestore(app),resultado=document.getElementById("resultado"),status=document.getElementById("status"),botoes=[...document.querySelectorAll("button")];
 const esc=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
 const dataFmt=v=>{if(!v)return"—";const d=new Date(v);return Number.isNaN(d.getTime())?v:d.toLocaleString("pt-BR")};
