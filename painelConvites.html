@@ -50,7 +50,76 @@ async function confirmados(){loading(true);try{const c=await todos(),r=c.filter(
 
 async function pendentes(){loading(true);try{const c=await todos(),p=c.filter(x=>x.respondeu!==true),total=p.reduce((s,x)=>s+(x.convidados||[]).length,0);resultado.innerHTML=`<h2>Convites pendentes</h2><div class="summary"><div class="summary-card">Convites pendentes<strong>${p.length}</strong></div><div class="summary-card">Pessoas aguardando resposta<strong>${total}</strong></div></div><div class="list">${p.map(x=>`<article class="item"><h3>⏳ ${esc(x.nomeConvite||x.grupoPlanilha||x.codigo)}</h3><div><strong>Grupo:</strong> ${esc(x.grupoPlanilha||"—")}</div><div><strong>Convidados:</strong> ${esc((x.convidados||[]).join(", "))}</div><div><strong>Link:</strong> ${esc(x.linkPersonalizado||`https://suelen-felipe.vercel.app/?convite=${x.codigo}`)}</div></article>`).join("")||'<div class="empty">Todos já responderam.</div>'}</div>`}catch(e){aviso(`Erro: ${e.message}`,true)}finally{loading(false)}}
 
-async function listaPresenca(){loading(true);try{const c=await todos(),p=c.flatMap(x=>(x.confirmados||[]).map(nome=>({nome,grupo:x.grupoPlanilha||x.nomeConvite||""}))).sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR"));resultado.innerHTML=`<h2>Lista de presença</h2><div class="summary"><div class="summary-card">Total confirmado<strong>${p.length}</strong></div></div><div class="list">${p.map((x,i)=>`<article class="item"><strong>${i+1}. ${esc(x.nome)}</strong><div class="muted">${esc(x.grupo)}</div></article>`).join("")||'<div class="empty">Nenhum confirmado.</div>'}</div>`}catch(e){aviso(`Erro: ${e.message}`,true)}finally{loading(false)}}
+async function listaPresenca() {
+  definirCarregamento(true);
+
+  try {
+    const convites = await buscarTodosConvites();
+
+    const grupos = convites
+      .filter(convite => (convite.confirmados || []).length > 0)
+      .sort((a, b) => {
+        const grupoA = a.grupoPlanilha || "";
+        const grupoB = b.grupoPlanilha || "";
+
+        const familiaA = grupoA.startsWith("Família");
+        const familiaB = grupoB.startsWith("Família");
+
+        if (familiaA && !familiaB) return -1;
+        if (!familiaA && familiaB) return 1;
+
+        const numeroA = Number(grupoA.match(/\d+/)?.[0] || 9999);
+        const numeroB = Number(grupoB.match(/\d+/)?.[0] || 9999);
+
+        return numeroA - numeroB;
+      });
+
+    let contador = 1;
+    let totalConfirmados = 0;
+
+    const itens = grupos.map(convite => {
+      const confirmados = convite.confirmados || [];
+      totalConfirmados += confirmados.length;
+
+      const pessoas = confirmados.map(nome => {
+        const numeroAtual = contador++;
+
+        return `
+          <article class="item">
+            <strong>${numeroAtual}. ${escaparHtml(nome)}</strong>
+            <div class="muted">
+              ${escaparHtml(convite.grupoPlanilha || convite.nomeConvite || "")}
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      return pessoas;
+    }).join("");
+
+    resultado.innerHTML = `
+      <h2>Lista de presença</h2>
+
+      <div class="summary">
+        <div class="summary-card">
+          Total confirmado
+          <strong>${totalConfirmados}</strong>
+        </div>
+      </div>
+
+      <div class="list">
+        ${itens || '<div class="empty">Nenhum convidado confirmado ainda.</div>'}
+      </div>
+    `;
+  } catch (erro) {
+    mostrarStatus(
+      `Erro ao montar lista de presença: ${erro.message}`,
+      "erro"
+    );
+  } finally {
+    definirCarregamento(false);
+  }
+}
 
 async function exportarJSON(){loading(true);try{const c=await todos(),obj={};c.forEach(x=>{const{codigo,...dados}=x;obj[codigo]=dados});baixar(JSON.stringify(obj,null,2),`backup-convites-${new Date().toISOString().slice(0,10)}.json`,"application/json;charset=utf-8");aviso("Backup JSON baixado com sucesso.")}catch(e){aviso(`Erro: ${e.message}`,true)}finally{loading(false)}}
 
