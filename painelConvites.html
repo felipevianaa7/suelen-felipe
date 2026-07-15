@@ -79,13 +79,11 @@ async function listaPresenca() {
 
     const itens = grupos.map(convite => {
       const confirmados = convite.confirmados || [];
-
       totalConfirmados += confirmados.length;
 
       return confirmados.map(nome => `
         <article class="item">
           <strong>${contador++}. ${esc(nome)}</strong>
-
           <div class="muted">
             ${esc(convite.grupoPlanilha || convite.nomeConvite || "")}
           </div>
@@ -107,10 +105,8 @@ async function listaPresenca() {
         ${itens || '<div class="empty">Nenhum convidado confirmado ainda.</div>'}
       </div>
     `;
-
   } catch (e) {
     aviso(`Erro ao montar lista de presença: ${e.message}`, true);
-
   } finally {
     loading(false);
   }
