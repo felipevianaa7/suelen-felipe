@@ -1,219 +1,73 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Painel de Convites</title>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Administrativo | Suelen & Felipe</title>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <style>
-    body{
-      font-family: Arial, Helvetica, sans-serif;
-      max-width:900px;
-      margin:40px auto;
-      padding:20px;
-      background:#f8f8f8;
-    }
-
-    button{
-      padding:12px 20px;
-      font-size:16px;
-      cursor:pointer;
-      border:none;
-      border-radius:8px;
-      background:#2e7d32;
-      color:white;
-    }
-
-    pre{
-      margin-top:20px;
-      padding:20px;
-      background:white;
-      border-radius:10px;
-      white-space:pre-wrap;
-      line-height:1.6;
-      border:1px solid #ddd;
-      min-height:300px;
-    }
+    :root{--bg:#fff8f3;--card:#fff;--primary:#8b5e3c;--dark:#5f3d27;--ok:#2f7d46;--warn:#a86c00;--danger:#b63b3b;--muted:#74665d;--border:rgba(139,94,60,.18);--shadow:0 16px 38px rgba(82,51,30,.12)}
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;padding:32px 16px;font-family:Arial,Helvetica,sans-serif;color:#33251d;background:linear-gradient(180deg,#fff8f3 0%,#f7eadf 100%)}
+    .container{width:min(1080px,100%);margin:auto}.header{text-align:center;margin-bottom:24px}.header h1{margin:0 0 8px;font:700 clamp(32px,6vw,52px) Georgia,serif;color:var(--dark)}.header p{margin:0;color:var(--muted)}
+    .actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}button{min-height:52px;border:0;border-radius:15px;padding:12px 15px;cursor:pointer;font-weight:700;font-size:15px;background:var(--primary);color:#fff;box-shadow:0 8px 20px rgba(95,61,39,.14)}button:hover{transform:translateY(-2px)}button:disabled{opacity:.65;cursor:wait;transform:none}.secondary{background:#6e5d52}.success{background:var(--ok)}.warning{background:var(--warn)}
+    .status{display:none;margin-bottom:16px;border-radius:14px;padding:12px 15px;font-weight:700}.panel{min-height:360px;padding:22px;border:1px solid var(--border);border-radius:24px;background:var(--card);box-shadow:var(--shadow)}.panel h2{margin:0 0 16px;color:var(--dark);font-family:Georgia,serif}
+    .summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}.summary-card{padding:16px;border-radius:17px;border:1px solid var(--border);background:#fffaf6}.summary-card strong{display:block;margin-top:5px;font-size:25px;color:var(--dark)}
+    .list{display:grid;gap:12px}.item{padding:16px;border:1px solid var(--border);border-radius:16px;background:#fffaf6;line-height:1.6}.item h3{margin:0 0 7px;color:var(--dark)}.muted{color:var(--muted)}.empty{text-align:center;padding:28px;color:var(--muted)}pre{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
+    @media(max-width:800px){.actions{grid-template-columns:1fr 1fr}.summary{grid-template-columns:1fr 1fr}}@media(max-width:520px){.actions,.summary{grid-template-columns:1fr}.panel{padding:16px}}
   </style>
-
 </head>
 <body>
-
-<h1>Importador de Convites</h1>
-
-<button id="btnImportar">
-Importar Convites
-</button>
-<button id="btnConfirmados">
-  Ver convidados confirmados
-</button>
-  
-
-<pre id="resultado"></pre>
-
+<main class="container">
+  <header class="header"><h1>💍 Painel Administrativo</h1><p>Gestão dos convites de Suelen & Felipe</p></header>
+  <section class="actions">
+    <button id="btnImportar">📥 Importar novos convites</button>
+    <button id="btnConfirmados" class="success">👥 Ver convidados confirmados</button>
+    <button id="btnExcel" class="secondary">📊 Exportar Excel</button>
+    <button id="btnJson" class="secondary">📄 Exportar JSON</button>
+    <button id="btnPendentes" class="warning">⏳ Pendentes</button>
+    <button id="btnPresenca" class="success">📋 Lista de presença</button>
+  </section>
+  <div id="status" class="status"></div>
+  <section id="resultado" class="panel"><h2>Bem-vindo</h2><p class="muted">Escolha uma opção acima.</p></section>
+</main>
 <script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import {getFirestore,doc,getDoc,setDoc,collection,getDocs} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-const firebaseConfig = {
-
-  apiKey: "AIzaSyDRxzCw9FJ-gSFfznw0EAl7HBqnrCPM6GQ",
-
-  authDomain: "casamento-suelen-felipe.firebaseapp.com",
-
-  projectId: "casamento-suelen-felipe",
-
-  storageBucket: "casamento-suelen-felipe.firebasestorage.app",
-
-  messagingSenderId: "304619466326",
-
-  appId: "1:304619466326:web:6be173a3612945781e55f7"
-
+const firebaseConfig={
+  apiKey:"AIzaSyDRxzCw9FJ-gSFfznw0EAl7HBqnrCPM6GQ",
+  authDomain:"casamento-suelen-felipe.firebaseapp.com",
+  projectId:"casamento-suelen-felipe",
+  storageBucket:"casamento-suelen-felipe.firebasestorage.app",
+  messagingSenderId:"304619466326",
+  appId:"1:304619466326:web:6be173a3612945781e55f7"
 };
+const app=initializeApp(firebaseConfig),db=getFirestore(app),resultado=document.getElementById("resultado"),status=document.getElementById("status"),botoes=[...document.querySelectorAll("button")];
+const esc=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+const dataFmt=v=>{if(!v)return"—";const d=new Date(v);return Number.isNaN(d.getTime())?v:d.toLocaleString("pt-BR")};
+function loading(v){botoes.forEach(b=>b.disabled=v)}
+function aviso(msg,erro=false){status.style.display="block";status.textContent=msg;status.style.background=erro?"#fff0f0":"#eef8f0";status.style.color=erro?"#b63b3b":"#2f7d46"}
+async function todos(){const s=await getDocs(collection(db,"convites"));return s.docs.map(d=>({codigo:d.id,...d.data()})).sort((a,b)=>(a.grupoPlanilha||a.nomeConvite||"").localeCompare(b.grupoPlanilha||b.nomeConvite||"","pt-BR",{numeric:true}))}
+function baixar(conteudo,nome,tipo){const blob=new Blob([conteudo],{type:tipo}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=nome;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
 
-const app = initializeApp(firebaseConfig);
+async function importar(){loading(true);resultado.innerHTML="<h2>Importação</h2><pre>Carregando JSON...</pre>";try{const r=await fetch("./convites_firebase_atualizado.json",{cache:"no-store"});if(!r.ok)throw new Error("Arquivo convites_firebase_atualizado.json não encontrado.");const conv=await r.json(),codigos=Object.keys(conv);let criados=0,existentes=0;const linhas=[`Encontrados ${codigos.length} convites.\n`];for(const codigo of codigos){const dados=conv[codigo],ref=doc(db,"convites",codigo),ex=await getDoc(ref);if(ex.exists()){existentes++;linhas.push(`⏭️ Já existia, não alterado: ${codigo} - ${dados.nomeConvite}`);continue}await setDoc(ref,{...dados,codigo});criados++;linhas.push(`✅ Criado: ${codigo} - ${dados.nomeConvite}`)}linhas.push("",`🆕 Criados: ${criados}`,`⏭️ Já existiam: ${existentes}`,`Total analisado: ${codigos.length}`);resultado.innerHTML=`<h2>Resultado da importação</h2><pre>${esc(linhas.join("\n"))}</pre>`;aviso("Importação concluída sem sobrescrever convites existentes.")}catch(e){resultado.innerHTML=`<h2>Erro</h2><p>${esc(e.message)}</p>`;aviso(e.message,true)}finally{loading(false)}}
 
-const db = getFirestore(app);
+async function confirmados(){loading(true);try{const c=await todos(),r=c.filter(x=>x.respondeu===true),total=r.reduce((s,x)=>s+(x.confirmados||[]).length,0);resultado.innerHTML=`<h2>Convidados confirmados</h2><div class="summary"><div class="summary-card">Convites respondidos<strong>${r.length}</strong></div><div class="summary-card">Pessoas confirmadas<strong>${total}</strong></div></div><div class="list">${r.map(x=>`<article class="item"><h3>✅ ${esc(x.nomeConvite||x.grupoPlanilha||x.codigo)}</h3><div><strong>Grupo:</strong> ${esc(x.grupoPlanilha||"—")}</div><div><strong>Confirmados:</strong> ${esc((x.confirmados||[]).join(", ")||"Nenhum")}</div><div><strong>Observação:</strong> ${esc(x.observacao||"—")}</div><div><strong>Respondido em:</strong> ${esc(dataFmt(x.respondidoEm))}</div></article>`).join("")||'<div class="empty">Nenhuma confirmação registrada.</div>'}</div>`}catch(e){aviso(`Erro: ${e.message}`,true)}finally{loading(false)}}
 
-const resultado = document.getElementById("resultado");
+async function pendentes(){loading(true);try{const c=await todos(),p=c.filter(x=>x.respondeu!==true),total=p.reduce((s,x)=>s+(x.convidados||[]).length,0);resultado.innerHTML=`<h2>Convites pendentes</h2><div class="summary"><div class="summary-card">Convites pendentes<strong>${p.length}</strong></div><div class="summary-card">Pessoas aguardando resposta<strong>${total}</strong></div></div><div class="list">${p.map(x=>`<article class="item"><h3>⏳ ${esc(x.nomeConvite||x.grupoPlanilha||x.codigo)}</h3><div><strong>Grupo:</strong> ${esc(x.grupoPlanilha||"—")}</div><div><strong>Convidados:</strong> ${esc((x.convidados||[]).join(", "))}</div><div><strong>Link:</strong> ${esc(x.linkPersonalizado||`https://suelen-felipe.vercel.app/?convite=${x.codigo}`)}</div></article>`).join("")||'<div class="empty">Todos já responderam.</div>'}</div>`}catch(e){aviso(`Erro: ${e.message}`,true)}finally{loading(false)}}
 
-async function verConfirmados() {
-      resultado.textContent = "Buscando confirmações...\n\n";
-    
-      const snapshot = await getDocs(collection(db, "convites"));
-    
-      let totalConfirmados = 0;
-      let gruposRespondidos = 0;
-    
-      snapshot.forEach((documento) => {
-        const dados = documento.data();
-    
-        if (dados.respondeu === true) {
-          gruposRespondidos++;
-    
-          const confirmados = dados.confirmados || [];
-          totalConfirmados += confirmados.length;
-    
-          resultado.textContent += `✅ ${dados.nomeConvite}\n`;
-          resultado.textContent += `Confirmados: ${confirmados.join(", ")}\n`;
-    
-          if (dados.observacao) {
-            resultado.textContent += `Observação: ${dados.observacao}\n`;
-          }
-    
-          if (dados.respondidoEm) {
-            resultado.textContent += `Data: ${new Date(dados.respondidoEm).toLocaleString("pt-BR")}\n`;
-          }
-    
-          resultado.textContent += "\n-------------------------\n\n";
-        }
-      });
-    
-      resultado.textContent += `Resumo:\n`;
-      resultado.textContent += `Grupos que responderam: ${gruposRespondidos}\n`;
-      resultado.textContent += `Total de pessoas confirmadas: ${totalConfirmados}\n`;
-    }  
+async function listaPresenca(){loading(true);try{const c=await todos(),p=c.flatMap(x=>(x.confirmados||[]).map(nome=>({nome,grupo:x.grupoPlanilha||x.nomeConvite||""}))).sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR"));resultado.innerHTML=`<h2>Lista de presença</h2><div class="summary"><div class="summary-card">Total confirmado<strong>${p.length}</strong></div></div><div class="list">${p.map((x,i)=>`<article class="item"><strong>${i+1}. ${esc(x.nome)}</strong><div class="muted">${esc(x.grupo)}</div></article>`).join("")||'<div class="empty">Nenhum confirmado.</div>'}</div>`}catch(e){aviso(`Erro: ${e.message}`,true)}finally{loading(false)}}
 
-async function importarConvites(){
+async function exportarJSON(){loading(true);try{const c=await todos(),obj={};c.forEach(x=>{const{codigo,...dados}=x;obj[codigo]=dados});baixar(JSON.stringify(obj,null,2),`backup-convites-${new Date().toISOString().slice(0,10)}.json`,"application/json;charset=utf-8");aviso("Backup JSON baixado com sucesso.")}catch(e){aviso(`Erro: ${e.message}`,true)}finally{loading(false)}}
 
-    resultado.textContent="Carregando JSON...\n\n";
+async function exportarExcel(){loading(true);try{if(!window.XLSX)throw new Error("Biblioteca Excel não carregada.");const c=await todos(),todosConv=c.map(x=>({Código:x.codigo,Grupo:x.grupoPlanilha||"","Nome do convite":x.nomeConvite||"","Todos os convidados":(x.convidados||[]).join(", "),"Quantidade convidada":x.qtdConvidados??(x.convidados||[]).length,Respondeu:x.respondeu===true?"Sim":"Não",Confirmados:(x.confirmados||[]).join(", "),"Quantidade confirmada":(x.confirmados||[]).length,Observação:x.observacao||"","Respondido em":dataFmt(x.respondidoEm),"Link personalizado":x.linkPersonalizado||`https://suelen-felipe.vercel.app/?convite=${x.codigo}`})),pres=c.flatMap(x=>(x.confirmados||[]).map(nome=>({"Nome confirmado":nome,Grupo:x.grupoPlanilha||"","Nome do convite":x.nomeConvite||"",Código:x.codigo}))).sort((a,b)=>a["Nome confirmado"].localeCompare(b["Nome confirmado"],"pt-BR")),pend=c.filter(x=>x.respondeu!==true).map(x=>({Grupo:x.grupoPlanilha||"","Nome do convite":x.nomeConvite||"",Convidados:(x.convidados||[]).join(", "),Quantidade:x.qtdConvidados??(x.convidados||[]).length,"Link personalizado":x.linkPersonalizado||`https://suelen-felipe.vercel.app/?convite=${x.codigo}`}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(todosConv),"Todos os convites");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(pres),"Lista de presença");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(pend),"Pendentes");XLSX.writeFile(wb,`controle-convites-${new Date().toISOString().slice(0,10)}.xlsx`,{compression:true});aviso("Planilha Excel baixada com sucesso.")}catch(e){aviso(`Erro: ${e.message}`,true)}finally{loading(false)}}
 
-    let resposta;
-
-    try{
-
-        resposta = await fetch("./convites_firebase_atualizado.json");
-
-    }catch{
-
-        resultado.textContent="Erro ao localizar o JSON.";
-
-        return;
-
-    }
-
-    if(!resposta.ok){
-
-        resultado.textContent="Arquivo JSON não encontrado.";
-
-        return;
-
-    }  
-
-    const convites = await resposta.json();
-
-    const codigos = Object.keys(convites);
-
-    resultado.textContent += `Encontrados ${codigos.length} convites.\n\n`;
-
-    let criados = 0;
-    let existentes = 0;
-
-    for(const codigo of codigos){
-
-        const dados = convites[codigo];
-
-        const ref = doc(db,"convites",codigo);
-
-        const documento = await getDoc(ref);
-
-        if(documento.exists()){
-
-            existentes++;
-
-            resultado.textContent += `⏭️ Já existia: ${codigo} - ${dados.nomeConvite}\n`;
-
-            continue;
-
-        }
-
-        await setDoc(ref,{
-            ...dados,
-            codigo
-        });
-
-        criados++;
-
-        resultado.textContent += `✅ Criado: ${codigo} - ${dados.nomeConvite}\n`;
-
-    }
-
-    resultado.textContent += `    
-
-==================================
-
-Resumo
-
-🆕 Criados: ${criados}
-
-⏭️ Já existiam: ${existentes}
-
-Total analisado: ${codigos.length}
-
-==================================
-
-Importação concluída com sucesso!
-`;
-
-}
-
-document
-.getElementById("btnImportar")
-.addEventListener("click",importarConvites);
-
- document
- .getElementById("btnConfirmados")
- .addEventListener("click", verConfirmados); 
-
+document.getElementById("btnImportar").addEventListener("click",importar);
+document.getElementById("btnConfirmados").addEventListener("click",confirmados);
+document.getElementById("btnExcel").addEventListener("click",exportarExcel);
+document.getElementById("btnJson").addEventListener("click",exportarJSON);
+document.getElementById("btnPendentes").addEventListener("click",pendentes);
+document.getElementById("btnPresenca").addEventListener("click",listaPresenca);
 </script>
-
 </body>
 </html>
