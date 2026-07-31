@@ -890,5 +890,18 @@
     "nomeConvite": "Alessandra",
     "respondeu": true,
     "qtdConvidados": 1
+  },
+  "C-XQUOB9K2": {
+    "nomeConvite": "Mayara",
+    "grupoPlanilha": "Individual 12",
+    "convidados": [
+      "Mayara"
+    ],
+    "padrinhosMadrinhas": [],
+    "qtdConvidados": 1,
+    "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-XQUOB9K2",
+    "respondeu": false,
+    "confirmados": [],
+    "observacao": ""
   }
 }
