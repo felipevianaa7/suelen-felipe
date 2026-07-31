@@ -62,20 +62,6 @@
     "nomeConvite": "Juliana e Leonardo",
     "qtdConvidados": 2
   },
-  "C-PBVSECSL": {
-    "convidados": [
-      "Cristina",
-      "Pedro"
-    ],
-    "grupoPlanilha": "Família 4",
-    "padrinhosMadrinhas": [],
-    "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-PBVSECSL",
-    "observacao": "",
-    "qtdConvidados": 2,
-    "nomeConvite": "Cristina e Pedro",
-    "respondeu": false,
-    "confirmados": []
-  },
   "C-7GRUMUBN": {
     "convidados": [
       "Rosangela",
@@ -138,22 +124,6 @@
     "nomeConvite": "Adriana e Anselmo",
     "respondeu": true,
     "qtdConvidados": 3
-  },
-  "C-LMW9EWAT": {
-    "observacao": "",
-    "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-LMW9EWAT",
-    "padrinhosMadrinhas": [],
-    "convidados": [
-      "Renata",
-      "Fernando",
-      "Thainá",
-      "Daniel"
-    ],
-    "grupoPlanilha": "Família 8",
-    "confirmados": [],
-    "nomeConvite": "Renata e Fernando",
-    "respondeu": false,
-    "qtdConvidados": 4
   },
   "C-HCN3AP97": {
     "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-HCN3AP97",
@@ -368,20 +338,6 @@
     "respondeu": true,
     "qtdConvidados": 2
   },
-  "C-M7RRXG4W": {
-    "qtdConvidados": 2,
-    "nomeConvite": "Lediane e Marcos",
-    "respondeu": false,
-    "confirmados": [],
-    "convidados": [
-      "Lediane",
-      "Marcos"
-    ],
-    "grupoPlanilha": "Família 19",
-    "padrinhosMadrinhas": [],
-    "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-M7RRXG4W",
-    "observacao": ""
-  },
   "C-F7ELPSJL": {
     "qtdConvidados": 2,
     "respondeu": true,
@@ -586,20 +542,6 @@
     "nomeConvite": "Ana Clara, Anderson, Alan e Adrielle",
     "respondeu": true
   },
-  "C-H5P2WY8M": {
-    "qtdConvidados": 2,
-    "nomeConvite": "Matheus e Geane",
-    "respondeu": false,
-    "confirmados": [],
-    "convidados": [
-      "Matheus",
-      "Geane"
-    ],
-    "grupoPlanilha": "Família 32",
-    "padrinhosMadrinhas": [],
-    "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-H5P2WY8M",
-    "observacao": ""
-  },
   "C-R8X4LF2K": {
     "padrinhosMadrinhas": [],
     "grupoPlanilha": "Família 33",
@@ -679,20 +621,6 @@
     "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-TGX5CEMG",
     "observacao": ""
   },
-  "C-YPXQ6KDG": {
-    "padrinhosMadrinhas": [],
-    "grupoPlanilha": "Família 37",
-    "convidados": [
-      "Thays",
-      "Thiago"
-    ],
-    "observacao": "",
-    "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-YPXQ6KDG",
-    "nomeConvite": "Thays e Thiago",
-    "respondeu": false,
-    "qtdConvidados": 2,
-    "confirmados": []
-  },
   "C-QBN5XYTC": {
     "observacao": "",
     "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-QBN5XYTC",
@@ -710,76 +638,6 @@
     "nomeConvite": "Rafael e Helen",
     "respondeu": true,
     "qtdConvidados": 2
-  },
-  "C-1319TGSC": {
-    "observacao": "",
-    "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-1319TGSC",
-    "padrinhosMadrinhas": [],
-    "grupoPlanilha": "Família 39",
-    "convidados": [
-      "Ideomar",
-      "Josiene"
-    ],
-    "confirmados": [],
-    "nomeConvite": "Ideomar e Josiene",
-    "respondeu": false,
-    "qtdConvidados": 2
-  },
-  "C-FX8VCGNI": {
-    "observacao": "",
-    "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-FX8VCGNI",
-    "padrinhosMadrinhas": [],
-    "convidados": [
-      "Luzia",
-      "Esposo"
-    ],
-    "grupoPlanilha": "Família 40",
-    "confirmados": [],
-    "nomeConvite": "Luzia e Esposo",
-    "respondeu": false,
-    "qtdConvidados": 2
-  },
-  "C-W4SH8N2G": {
-    "observacao": "",
-    "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-W4SH8N2G",
-    "padrinhosMadrinhas": [],
-    "convidados": [
-      "Washington",
-      "Viviane",
-      "David",
-      "Benjamin"
-    ],
-    "grupoPlanilha": "Família 41",
-    "confirmados": [],
-    "nomeConvite": "Washington e família",
-    "respondeu": false,
-    "qtdConvidados": 4
-  },
-  "C-NWP8SAZR": {
-    "observacao": "",
-    "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-NWP8SAZR",
-    "padrinhosMadrinhas": [],
-    "grupoPlanilha": "Individual 1",
-    "convidados": [
-      "Tania"
-    ],
-    "confirmados": [],
-    "nomeConvite": "Tania",
-    "respondeu": false,
-    "qtdConvidados": 1
-  },
-  "C-HU9WHYC6": {
-    "nomeConvite": "Katia",
-    "respondeu": false,
-    "qtdConvidados": 1,
-    "confirmados": [],
-    "padrinhosMadrinhas": [],
-    "convidados": [
-      "Katia"
-    ],
-    "grupoPlanilha": "Individual 2",
-    "observacao": "",
-    "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-HU9WHYC6"
   },
   "C-FT4PNF4R": {
     "qtdConvidados": 1,
@@ -848,32 +706,6 @@
     "nomeConvite": "Maria das Graças",
     "respondeu": true,
     "qtdConvidados": 1
-  },
-  "C-57H2B8K6": {
-    "confirmados": [],
-    "qtdConvidados": 1,
-    "nomeConvite": "Rejane",
-    "respondeu": false,
-    "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-57H2B8K6",
-    "observacao": "",
-    "convidados": [
-      "Rejane"
-    ],
-    "grupoPlanilha": "Individual 7",
-    "padrinhosMadrinhas": []
-  },
-  "C-9NT4HPX4": {
-    "confirmados": [],
-    "qtdConvidados": 1,
-    "nomeConvite": "Magaly",
-    "respondeu": false,
-    "linkPersonalizado": "https://suelen-felipe.vercel.app/?convite=C-9NT4HPX4",
-    "observacao": "",
-    "convidados": [
-      "Magaly"
-    ],
-    "grupoPlanilha": "Individual 8",
-    "padrinhosMadrinhas": []
   },
   "C-J8V5QK2L": {
     "observacao": "",
